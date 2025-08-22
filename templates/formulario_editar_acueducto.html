@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="card card-body">
+    <div class="col-md-6 offset-md-3">
+        <h1 class="text-center">Editar Acueducto</h1>
+        <form action="{{ url_for('actualizar_acueducto', id=acueducto[0]) }}" method="POST">
+            <input type="hidden" name="id" value="{{ acueducto[0] }}">
+            <div class="form-floating mb-3">
+                <input type="text" name="nombre" value="{{ acueducto[1] }}" required class="form-control"
+                    id="floatingNombre" placeholder="Nombre">
+                <label for="floatingNombre">Nombre</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" name="ubicacion" value="{{ acueducto[2] }}" required class="form-control"
+                    id="floatingUbicacion" placeholder="Ubicación">
+                <label for="floatingUbicacion">Ubicación</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="date" name="fecha_analisis" value="{{ acueducto[3] }}" required class="form-control"
+                    id="floatingFechaAnalisis" placeholder="Fecha de Análisis">
+                <label for="floatingFechaAnalisis">Fecha de Análisis</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" name="ph" value="{{ acueducto[4] }}" class="form-control" id="floatingPH"
+                    placeholder="pH">
+                <label for="floatingPH">pH</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" name="clorox" value="{{ acueducto[5] }}" class="form-control" id="floatingClorox"
+                    placeholder="Clorox">
+                <label for="floatingClorox">Clorox</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" name="bacterias" value="{{ acueducto[6] }}" class="form-control"
+                    id="floatingBacterias" placeholder="Bacterias">
+                <label for="floatingBacterias">Bacterias</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" name="descripcion" value="{{ acueducto[7] }}" class="form-control"
+                    id="floatingDescripcion" placeholder="Descripción">
+                <label for="floatingDescripcion">Descripción</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select name="departamento" id="departamento" class="form-select" required>
+                    <option value="" disabled>Selecciona un Departamento</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento }}" {% if departamento==acueducto[8] %}selected{% endif %}>{{
+                        departamento }}</option>
+                    {% endfor %}
+                </select>
+                <label for="departamento">Departamento</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select name="identificacion_funcionario" id="identificacion_funcionario" class="form-select" required>
+                    <option value="" disabled selected>Selecciona un Funcionario</option>
+                    {% for funcionario in funcionarios %}
+                    <option value="{{ funcionario[0] }}" {% if funcionario[0]==acueducto[8] %}selected{% endif %}>
+                        {{ funcionario[0] }} / {{ funcionario[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <label for="identificacion_funcionario">ID del Funcionario</label>
+            </div>
+
+            <div class="d-grid gap-2 pt-2">
+                <button type="submit" class="btn btn-outline-primary">Actualizar</button>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('agregar_acueducto') }}" class="btn btn-outline-primary">Ir a la página de
+                        Acueductos</a>
+                    <a href="{{ url_for('editar_acueducto') }}" class="btn btn-outline-primary">Volver</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

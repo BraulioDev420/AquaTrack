@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="card card-body">
+    <div class="col-md-4 offset-md-4">
+        <h1>Editar Funcionario</h1>
+        <form action="{{ url_for('editar_funcionario') }}" method="POST">
+            <div class="form-group d-flex align-items-center">
+                <select name="identificacion" id="identificacion" required class="form-select me-3">
+                    <option value="" disabled selected>Selecciona un Funcionario</option>
+                    {% for funcionario in funcionarios %}
+                    <option value="{{ funcionario[0] }}">{{ funcionario[1] }}/ {{ funcionario[2] }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-outline-primary me-2">Cargar</button>
+                <a href="{{ url_for('agregar_funcionario') }}" class="btn btn-outline-primary me-1">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

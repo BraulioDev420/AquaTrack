@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="card card-body">
+    <div class="col-md-6 offset-md-3">
+        <h1 class="text-center mb-4">Editar Acueducto</h1>
+        <form action="{{ url_for('editar_acueducto') }}" method="POST">
+            <div class="mb-3">
+                <div class="form-group d-flex align-items-center">
+                    <select name="acueducto_id" id="acueducto_id" class="form-select me-2" required>
+                        <option value="" disabled selected>Selecciona un Acueducto</option>
+                        {% for acueducto in acueductos %}
+                            <option value="{{ acueducto[0] }}">{{ acueducto[0] }} / {{ acueducto[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary me-2">Cargar</button>
+                    <a href="{{ url_for('agregar_acueducto') }}" class="btn btn-outline-primary me-2">Volver</a>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+{% endblock %}
