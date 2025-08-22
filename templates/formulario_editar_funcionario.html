@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="card card-body">
+    <div class="col-md-4 offset-md-4">
+        <h1>Editar Funcionario</h1>
+        <form action="{{ url_for('actualizar_funcionario') }}" method="POST">
+            <input type="hidden" name="identificacion" value="{{ funcionario[0] }}">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingNuevaIdentificacion" name="nueva_identificacion"
+                    value="{{ funcionario[1] }}" placeholder="Identificación" required>
+                <label for="floatingNuevaIdentificacion">Identificación</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingNombre" name="nombre" value="{{ funcionario[2] }}"
+                    placeholder="Nombre" required>
+                <label for="floatingNombre">Nombre</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingApellido" name="apellido"
+                    value="{{ funcionario[3] }}" placeholder="Apellido" required>
+                <label for="floatingApellido">Apellido</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control" id="floatingTelefono" name="telefono"
+                    value="{{ funcionario[4] }}" placeholder="Teléfono" required>
+                <label for="floatingTelefono">Teléfono</label>
+            </div>
+
+            <div class="d-grid gap-2 pt-2">
+                <button type="submit" class="btn btn-outline-primary">Actualizar</button>
+                <div class="btn-group" role="group" aria-label="Botones de Funcionario">
+                    <a href="{{ url_for('agregar_funcionario') }}" class="btn btn-outline-primary">Ir a la página de
+                        Funcionarios</a>
+                    <a href="{{ url_for('editar_funcionario') }}" class="btn btn-outline-primary"
+                        role="button">Volver</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

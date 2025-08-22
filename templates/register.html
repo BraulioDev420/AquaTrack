@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block title %}Registrar Usuario{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Registrar Usuario</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="post">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingUsername" name="username" placeholder="Nombre de Usuario" required>
+                <label for="floatingUsername">Nombre de Usuario</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Contraseña" required>
+                <label for="floatingPassword">Contraseña</label>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-outline-primary btn-lg">Registrar</button>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Iniciar Sesión</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block navbar %}
+<!-- No se muestra el navbar en la página de registro -->
+{% endblock %}

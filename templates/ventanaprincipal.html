@@ -1,0 +1,214 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<head>
+    <div class="text-center">
+        <h1>Bienvenidos</h1>
+    </div>
+
+    <!-- Incluir jQuery completo -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<div class="row">
+    <!-- Mitad izquierda: Mapa con botones de zoom -->
+    <div class="col-md-6">
+        <div class="card card-body position-relative">
+            <!-- Botones de zoom -->
+            <div id="zoom-buttons" style="position: absolute; top: 20px; left: 20px; z-index: 55;">
+                <button id="zoom-in" style="display: block; margin-bottom: 10px;">+</button>
+                <button id="zoom-out" style="display: block;">-</button>
+            </div>
+            <div id="map-container"
+                style="width: 100%; height: 500px; display: flex; justify-content: center; align-items: center;">
+                <!-- Inserta el contenido SVG directamente aquí -->
+                <object id="colombia-map" type="image/svg+xml"
+                    data="{{ url_for('static', filename='mapa/colombia.svg') }}"
+                    style="width: 100%; height: 100%;"></object>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mitad derecha: Botones de Funcionario y Acueductos -->
+    <div class="col-md-6">
+        <div class="card card-body">
+            <div class="text-center pt-3">
+                <div class="mb-4">
+                    <h4>Agregar un Funcionario</h4>
+                    <a href="{{ url_for('agregar_funcionario') }}">
+                        <button class="btn btn-outline-primary">Funcionarios</button>
+                    </a>
+                </div>
+                <div>
+                    <h4>Agregar un Acueducto</h4>
+                    <a href="{{ url_for('agregar_acueducto') }}">
+                        <button class="btn btn-outline-primary">Acueductos</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Información del Departamento</h5>
+
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <!-- Contenido dinámico aquí -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function zoomMap(event) {
+        var svgObject = document.getElementById('colombia-map');
+        var svgDoc = svgObject.contentDocument;
+
+        // Obtener el factor de zoom
+        var delta = event.deltaY || event.detail || event.wheelDelta;
+
+        // Determinar la dirección del zoom
+        var zoomOut = delta > 0;
+
+        // Obtener la escala actual
+        var currentScale = svgDoc.documentElement.style.transform.match(/scale\(([^)]+)\)/);
+        currentScale = currentScale ? parseFloat(currentScale[1]) : 1;
+
+        // Calcular el nuevo factor de escala
+        var scaleFactor = zoomOut ? currentScale * 0.9 : currentScale * 1.1;
+
+        // Aplicar la escala al mapa
+        svgDoc.documentElement.style.transform = 'scale(' + scaleFactor + ')';
+    }
+
+    function centerAndZoom(svgDoc, element) {
+        var bbox = element.getBBox();
+        var centerX = bbox.x + bbox.width / 2;
+        var centerY = bbox.y + bbox.height / 2;
+
+        var viewBox = svgDoc.documentElement.viewBox.baseVal;
+        var svgCenterX = viewBox.width / 2;
+        var svgCenterY = viewBox.height / 2;
+
+        var translateX = svgCenterX - centerX;
+        var translateY = svgCenterY - centerY;
+
+        svgDoc.documentElement.style.transition = 'transform 0.5s ease';
+        svgDoc.documentElement.style.transformOrigin = 'center';
+        svgDoc.documentElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(2)`;
+    }
+
+    // Escuchar el evento 'DOMContentLoaded' para ejecutar el código cuando el documento esté listo
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener el objeto SVG
+        var svgObject = document.getElementById('colombia-map');
+        // Añadir un evento 'load' al objeto SVG para ejecutar código cuando se cargue
+        svgObject.addEventListener('load', function () {
+            // Obtener el documento SVG dentro del objeto SVG
+            var svgDoc = svgObject.contentDocument;
+
+            // Añadir el evento 'wheel' al documento SVG
+            svgDoc.documentElement.addEventListener('wheel', zoomMap);
+
+            // Seleccionar todos los elementos 'path' dentro del documento SVG
+            var departments = svgDoc.querySelectorAll('path');
+
+            // Añadir la clase 'path-hover' para cambiar el puntero del mouse y el color al pasar sobre el elemento
+            departments.forEach(function (dept) {
+                dept.classList.add('path-hover');
+                // Cambiar el puntero del mouse
+                dept.style.cursor = 'pointer';
+
+                // Cambiar el color cuando el mouse entra
+                dept.addEventListener('mouseenter', function () {
+                    dept.style.fill = 'yellow'; // Cambia el color al que desees
+                });
+
+                // Restaurar el color cuando el mouse sale
+                dept.addEventListener('mouseleave', function () {
+                    dept.style.fill = ''; // Restaura el color original
+                });
+
+                // Añadir un evento 'click' a cada elemento 'path'
+                dept.addEventListener('click', function () {
+                    var department = dept.id;
+                    fetch(`/acueductos_por_departamento?departamento=${department}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Mostrar los datos en el modal
+                            var modalBodyContent = document.getElementById('modalBodyContent');
+                            modalBodyContent.innerHTML = `<p>El número de acueductos en ${department} es ${data.num_acueductos}</p>`;
+
+                            // Ahora, obtén el promedio de pH, clorox y bacterias
+                            fetch(`/promedio_acueducto_por_departamento?departamento=${department}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    modalBodyContent.innerHTML += `<p>Promedio de pH: ${data.promedio_ph}</p>`;
+                                    modalBodyContent.innerHTML += `<p>Promedio de Clorox: ${data.promedio_clorox}</p>`;
+                                    modalBodyContent.innerHTML += `<p>Promedio de Bacterias: ${data.promedio_bacterias}</p>`;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching data:', error);
+                                });
+
+                            $('#infoModal').modal('show');
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                });
+
+                // Añadir un evento 'click' para hacer zoom en el departamento y centrarlo
+                dept.addEventListener('click', function () {
+                    centerAndZoom(svgDoc, dept);
+                });
+            });
+
+
+            // Obtener los botones de zoom
+            var zoomInButton = document.getElementById('zoom-in');
+            var zoomOutButton = document.getElementById('zoom-out');
+
+            // Añadir un evento 'click' al botón de zoom-in para hacer zoom
+            zoomInButton.addEventListener('click', function () {
+                var currentScale = svgDoc.documentElement.style.transform.match(/scale\(([^)]+)\)/);
+                currentScale = currentScale ? parseFloat(currentScale[1]) : 1;
+                svgDoc.documentElement.style.transition = 'transform 0.5s ease';
+                svgDoc.documentElement.style.transformOrigin = 'center';
+                svgDoc.documentElement.style.transform = 'scale(' + (currentScale * 1.5) + ')';
+            });
+
+            // Añadir un evento 'click' al botón de zoom-out para reducir el zoom
+            zoomOutButton.addEventListener('click', function () {
+                var currentScale = svgDoc.documentElement.style.transform.match(/scale\(([^)]+)\)/);
+                currentScale = currentScale ? parseFloat(currentScale[1]) : 1;
+                svgDoc.documentElement.style.transition = 'transform 0.5s ease';
+                svgDoc.documentElement.style.transformOrigin = 'center';
+                svgDoc.documentElement.style.transform = 'scale(' + (currentScale * 0.5) + ')';
+            });
+        });
+    });
+    $('#infoModal .close').on('click', function () {
+        $('#infoModal').modal('hide');
+    });
+    $('#infoModal .modal-footer button').on('click', function () {
+        $('#infoModal').modal('hide');
+    });
+
+</script>
+
+</body>
+{% endblock %}
