@@ -4,7 +4,7 @@ AquaTrack
 AquaTrack es una aplicación web desarrollada en Flask + MySQL para la gestión de acueductos en Colombia, enfocada en el control de calidad del agua y administración de funcionarios responsables.
 
 La plataforma permite registrar, visualizar y administrar acueductos a nivel nacional, asociando información relevante como indicadores de análisis (pH, cloro, bacterias), departamentos y responsables. Además, incluye un mapa interactivo en SVG de Colombia que muestra la cantidad de acueductos y funcionarios en cada departamento.
-
+---
 Características principales
 
 Autenticación de usuarios
